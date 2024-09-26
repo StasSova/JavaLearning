@@ -1,21 +1,28 @@
 package itstep.learning.oop;
 
+import itstep.learning.oop.annotations.Product;
+import itstep.learning.oop.annotations.Required;
+
 import java.util.Locale;
 
-public class Car extends Vehicle {
+@Product
+public class Car extends Vehicle implements Trailer {
     public String getCarBody() {
         return carBody;
     }
+
 
     public void setCarBody(String carBody) {
         this.carBody = carBody;
     }
 
-    private String carBody;
+    @Required
+    private String carBody = "";
 
+    public Car() {}
     public Car(String name, String carBody) {
-        super.setName(name);
-        setCarBody(carBody);
+        super(name);
+        this.setCarBody(carBody);
     }
 
     @Override
@@ -26,5 +33,11 @@ public class Car extends Vehicle {
                 super.getName(),
                 this.getCarBody()
         );
+    }
+
+
+    @Override
+    public String trailerInfo() {
+        return "Car trailer";
     }
 }

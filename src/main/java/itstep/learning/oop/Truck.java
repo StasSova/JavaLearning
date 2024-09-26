@@ -1,25 +1,25 @@
 package itstep.learning.oop;
 
+import itstep.learning.oop.annotations.Product;
+import itstep.learning.oop.annotations.Required;
+
 import java.util.Locale;
 
-public class Truck extends Vehicle implements LargeSized, Trailer {
+@Product
+public class Truck
+        extends Vehicle
+        implements LargeSized, Trailer {
 
+    @Required
     private double cargo;
 
-
-    public Truck(String name, double cargo) {
-        setCargo(cargo);
-        super.setName(name);
+    public Truck() {
     }
 
-    public void setCargo(double cargo) {
-        this.cargo = cargo;
+    public Truck(String name, double cargo ) {
+        super( name );
+        this.setCargo( cargo );
     }
-
-    public double getCargo() {
-        return cargo;
-    }
-
 
     @Override
     public String trailerInfo() {
@@ -33,6 +33,21 @@ public class Truck extends Vehicle implements LargeSized, Trailer {
                 "Truck '%s' with cargo %.1f tone(s)",
                 super.getName(),
                 this.getCargo()
-        );
+        ) ;
+    }
+
+    public double getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(double cargo) {
+        this.cargo = cargo;
     }
 }
+/*
+Ввести в систему класи для Crossover, Car
+Реалізувати в них відповідні інтерфейси
+Додати до "магазину" кілька об'єктів нових класів
+Переконатись у групуванні їх відповідно до реалізованих інтерфейсів.
+
+ */
