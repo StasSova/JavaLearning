@@ -7,13 +7,13 @@ import com.google.inject.Singleton;
 
 /**
  * KDF implementation by sec. 5.1 RFC 2898
- * */
+ */
 
 @Singleton
 public class PbKdf1Service implements KdfService {
 
-    private int dkLen = 20;
     private final HashService hashService;
+    private int dkLen = 20;
 
     @Inject
     public PbKdf1Service(HashService hashService) {
@@ -29,16 +29,16 @@ public class PbKdf1Service implements KdfService {
         int iterationCount = 0;
         int dotPos = salt.indexOf('.');
         if (dotPos > 0) {
-            try{
+            try {
                 iterationCount = Integer.parseInt(salt.substring(dotPos + 1));
+            } catch (NumberFormatException ignored) {
             }
-            catch(NumberFormatException ignored){}
 
         }
         if (iterationCount < 1 || iterationCount >= 10) {
             iterationCount = 3; // значення за замовченням
         }
-        String t  = hashService.hash(password + salt );
+        String t = hashService.hash(password + salt);
         for (int i = 1; i < iterationCount; i++) {
             t = hashService.hash(t);
         }

@@ -7,19 +7,19 @@ import java.util.Date;
 import java.util.UUID;
 
 public class User {
-    private UUID        userId         ;
-    private String      userName       ;
-    private String      email          ;
-    private String      phone          ;
-    private String      avatarUrl      ;
-    private Date        deleteDt       ;
-    private Date        birthdate      ;
-    private UserRole    role           ;
+    private UUID userId;
+    private String userName;
+    private String email;
+    private String phone;
+    private String avatarUrl;
+    private Date deleteDt;
+    private Date birthdate;
+    private UserRole role;
 
-    private Token       token          ;
+    private Token token;
 
 
-    public User(){
+    public User() {
 
 
     }
@@ -30,16 +30,15 @@ public class User {
         this.email = resultSet.getString("email");
         this.phone = resultSet.getString("phone");
         this.avatarUrl = resultSet.getString("avatar_url");
-        Timestamp timestamp = resultSet. getTimestamp( "birthdate" );
-        this. setBirthdate( new Date( timestamp. getTime() ) );
-        timestamp = resultSet. getTimestamp( "delete_dt" );
-        if( timestamp != null ) {
+        Timestamp timestamp = resultSet.getTimestamp("birthdate");
+        this.setBirthdate(new Date(timestamp.getTime()));
+        timestamp = resultSet.getTimestamp("delete_dt");
+        if (timestamp != null) {
             this.setDeleteDt(new Date(timestamp.getTime()));
         }
-        try{
+        try {
             this.setRole(new UserRole(resultSet));
-        }
-        catch(Exception ignored){
+        } catch (Exception ignored) {
             this.setRole(null);
         }
     }

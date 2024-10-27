@@ -30,10 +30,10 @@ public class CharsetFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
 // встановлюємо кодування, що буде діяти при читанні/записі даних
-        req.setCharacterEncoding( "UTF-8" );
-        resp.setCharacterEncoding( "UTF-8" );
-        System. out.println( "CharsetFilter worked for: " + req.getRequestURI() );
-        filterChain.doFilter( servletRequest, servletResponse );
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        System.out.println("CharsetFilter worked for: " + req.getRequestURI());
+        filterChain.doFilter(servletRequest, servletResponse);
 // "зворотній" хід - від представлення до сервера
 
 // await Next()

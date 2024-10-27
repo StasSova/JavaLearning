@@ -12,7 +12,7 @@ public class UserRole {
     private boolean canUpdate;
     private boolean canDelete;
 
-    public UserRole(){
+    public UserRole() {
 
     }
 

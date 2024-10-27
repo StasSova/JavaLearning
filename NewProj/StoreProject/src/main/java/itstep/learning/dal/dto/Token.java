@@ -11,11 +11,12 @@ public class Token {
     private Date iat;
     private Date exp;
 
-    public Token(){}
+    public Token() {
+    }
 
-public Token(ResultSet resultSet) throws SQLException {
+    public Token(ResultSet resultSet) throws SQLException {
         String id = resultSet.getString("token_id");
-        if(id == null){
+        if (id == null) {
             throw new SQLException("Token with null ID");
         }
         this.setTokenId(UUID.fromString(id));
