@@ -48,13 +48,14 @@ public class CategoryServlet extends RestServlet {
                 new RestMetaData()
                         .setUrl("/shop/category")
                         .setMethod((req.getMethod()))
-                        .setName("KN-P-213 Shop API for product categories")
-                        .setServerTime(new Date())
+                        . setName ( "KN-P-213 Shop API for product categories" )
+                        . setServerTime( new Date() )
                         .setAllowedMethods(new String[]{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
         );
 
         super.service(req, resp);
     }
+
 
 
     @Override
@@ -67,25 +68,26 @@ public class CategoryServlet extends RestServlet {
         FormParseResult formParseResult = formParseService.parse(req);
         String data = formParseResult.getFields().get("category-name");
         Category category = new Category();
-        if (data == null || data.isEmpty()) {
+        if( data == null || data. isEmpty() ) {
             super.sendResponse(400, "Missing required field 'category-name' ");
             return;
         }
 
-        category.setName(data);
+        category.setName( data );
 
         data = formParseResult.getFields().get("category-description");
-        if (data == null || data.isEmpty()) {
+        if( data == null || data. isEmpty() ) {
             super.sendResponse(400, "Missing required field 'category-description' ");
             return;
         }
 
-        category.setDescription(data);
+        category.setDescription( data );
 
         try {
             data = storageService.saveFile(
-                    formParseResult.getFiles().get("category-image"));
-        } catch (IOException ex) {
+                    formParseResult.getFiles().get("category-image") );
+        }
+        catch( IOException ex ) {
             logger.warning(ex.getMessage());
             super.sendResponse(400, "Missing required field 'category-image' ");
 
@@ -94,7 +96,9 @@ public class CategoryServlet extends RestServlet {
 
         if ((category = categoryDao.create(category)) != null) {
             super.sendResponse(200, category);
-        } else {
+        }
+        else
+        {
             super.sendResponse(500, "Error creating category");
         }
     }

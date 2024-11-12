@@ -9,7 +9,7 @@ public class RestMetaData {
     private String name;
     private Date serverTime;
     private String[] allowedMethods; // Resource manipulation through representations
-    private Map<String, Object> usedParameters;
+    private Map<String,Object> usedParameters;
 
     public String getName() {
         return name;

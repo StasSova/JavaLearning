@@ -26,6 +26,7 @@ public class HomeServlet extends HttpServlet {
     private final CartDao cartDao;
 
 
+
     @Inject
     public HomeServlet(AuthDao authDao, FileNameService fileNameService, DbService dbService, ProductDao productDao, CartDao cartDao) {
 
@@ -37,7 +38,7 @@ public class HomeServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
         boolean isSigned = false;
         Object signature = req.getAttribute("signature");
         if (signature instanceof Boolean) {
@@ -48,21 +49,23 @@ public class HomeServlet extends HttpServlet {
 
             String dbMessage;
             try {
-                dbMessage = authDao.install() && productDao.install() && cartDao.install() ? "Install OK" : "Install failed";
+                 dbMessage = authDao.install() && productDao.install() && cartDao.install() ? "Install OK" : "Install failed";
 
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 dbMessage = e.getMessage();
             }
 
 
             try {
-                Statement stmt = dbService.getConnection().createStatement();
+                Statement stmt = dbService. getConnection().createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT CURRENT_TIMESTAMP FROM dual");
                 rs.next();
-                dbMessage += " " + rs.getString(1);
+                dbMessage += " "+ rs.getString(1);
                 rs.close();
                 stmt.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 dbMessage += " " + e.getMessage();
             }
 
@@ -80,7 +83,7 @@ public class HomeServlet extends HttpServlet {
         }
 
         // ~ return View();
-        req.getRequestDispatcher("WEB-INF/views/_layout.jsp").forward(req, resp);
+        req.getRequestDispatcher( "WEB-INF/views/_layout.jsp" ).forward(req, resp);
 
         // resp.getWriter().println("<h1>Home</h1>");
     }

@@ -1,16 +1,13 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8"  %>
 
 <h2>Випадкові імена файлів</h2>
-<p>Ім'я файлу за замовчанням: <%= request.getAttribute("randomFileNameDefault") %>
-</p>
-<p>Ім'я файлу довжиною 12 символів: <%= request.getAttribute("randomFileNameWithLength") %>
-</p>
+<p>Ім'я файлу за замовчанням: <%= request.getAttribute("randomFileNameDefault") %></p>
+<p>Ім'я файлу довжиною 12 символів: <%= request.getAttribute("randomFileNameWithLength") %></p>
 
 
 <h1>Java web. JSP</h1>
 <img src="img/Java_Logo.svg" alt="logo" style="height: 200px">
-<i>Контроль інжекції хешу: <%= request.getAttribute("hash") %>
-</i>
+<i>Контроль інжекції хешу: <%= request.getAttribute("hash") %></i>
 <p>
     JSP - Java Server Pages - технологія веб-розробки з динамічним
     формуванням HTML сторінок. Аналогічно до PHP, ранніх ASP є
@@ -67,13 +64,12 @@ double[] prices = { 10.0, 20.0, 30.0, 40.0 };
 </pre>
 &rarr;
 <% for (int i = 0; i < prices.length; i++) { %>
-<i><%= prices[i] %>
-</i>&emsp;
+<i><%= prices[i] %></i>&emsp;
 <% } %>
 
 <h2>Взаємодія з файлами</h2>
 &lt;jsp:include page="WEB-INF/fragment.jsp" /&gt; &rarr;
-<jsp:include page="../fragment.jsp"/>
+<jsp:include page="../fragment.jsp" />
 
 <p>
     Д.3. Реалізувати виведення масиву double[] prices у вигляді HTML-таблиці
@@ -94,10 +90,8 @@ double[] prices = { 10.0, 20.0, 30.0, 40.0 };
         for (int i = 0; i < prices.length; i++) {
     %>
     <tr>
-        <td><%= i + 1 %>
-        </td>
-        <td><%= prices[i] %>
-        </td>
+        <td><%= i + 1 %></td>
+        <td><%= prices[i] %></td>
     </tr>
     <%
         }

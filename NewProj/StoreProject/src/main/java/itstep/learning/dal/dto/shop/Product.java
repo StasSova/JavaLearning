@@ -13,7 +13,7 @@ public class Product {
     private UUID categoryId;
     private String name;
     private String description;
-    private String imageUrl;
+    private  String imageUrl;
     private String slug;
     private Date deleteDt;
     private double price;
@@ -27,22 +27,20 @@ public class Product {
     }
 
     public Product(ResultSet rs) throws SQLException {
-        this.setId(UUID.fromString(rs.getString("product_id")));
-        this.setCategoryId(UUID.fromString(rs.getString("category_id")));
-        this.setName(rs.getString("product_name"));
-        this.setDescription(rs.getString("product_description"));
-        this.setImageUrl(rs.getString("product_img_url"));
-        this.setSlug(rs.getString("product_slug"));
-        this.setPrice(rs.getDouble("product_price"));
-        this.setQuantity(rs.getInt("product_amount"));
-        Timestamp timestamp = rs.getTimestamp("product_delete_dt");
-        if (timestamp != null) {
-            this.setDeleteDt(new Date(timestamp.getTime()));
+        this. setId( UUID. fromString( rs.getString( "product_id" ) ) );
+        this.setCategoryId( UUID.fromString( rs.getString( "category_id" ) ) );
+        this. setName( rs.getString( "product_name" ) );
+        this.setDescription( rs.getString( "product_description" ) );
+        this.setImageUrl( rs.getString( "product_img_url" ) );
+        this.setSlug( rs.getString( "product_slug" ) );
+        this.setPrice( rs.getDouble( "product_price" ) );
+        this.setQuantity( rs.getInt( "product_amount" ) );
+        Timestamp timestamp = rs.getTimestamp( "product_delete_dt" );
+        if ( timestamp != null ) {
+            this.setDeleteDt( new Date( timestamp.getTime() ) );
         }
-        try {
-            this.setCategory(new Category(rs));
-        } catch (Exception ignored) {
-        }
+        try { this.setCategory( new Category( rs ) ) ; }
+        catch (Exception ignored) {}
     }
 
     public Category getCategory() {

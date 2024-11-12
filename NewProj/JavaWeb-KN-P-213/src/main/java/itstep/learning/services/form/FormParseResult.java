@@ -6,6 +6,5 @@ import java.util.Map;
 
 public interface FormParseResult {
     Map<String, String> getFields();
-
     Map<String, FileItem> getFiles();
 }

@@ -10,22 +10,20 @@ public class Category {
     private UUID id;
     private String name;
     private String description;
-    private String imageUrl;
+    private  String imageUrl;
     private String slug;
     private Date deleteDt;
 
-    public Category() {
-    }
-
+    public Category() {}
     public Category(ResultSet rs) throws SQLException {
-        this.setId(UUID.fromString(rs.getString("category_id")));
-        this.setName(rs.getString("category_name"));
-        this.setDescription(rs.getString("category_description"));
-        this.setImageUrl(rs.getString("category_img_url"));
-        this.setSlug(rs.getString("category_slug"));
-        Timestamp timestamp = rs.getTimestamp("category_delete_dt");
-        if (timestamp != null) {
-            this.setDeleteDt(new Date(timestamp.getTime()));
+        this. setId( UUID. fromString( rs.getString( "category_id" ) ) );
+        this. setName( rs.getString( "category_name" ) );
+        this.setDescription( rs.getString( "category_description" ) );
+        this.setImageUrl( rs.getString( "category_img_url" ) );
+        this.setSlug( rs.getString( "category_slug" ) );
+        Timestamp timestamp = rs.getTimestamp( "category_delete_dt" );
+        if ( timestamp != null ) {
+            this.setDeleteDt( new Date( timestamp.getTime() ) );
         }
     }
 

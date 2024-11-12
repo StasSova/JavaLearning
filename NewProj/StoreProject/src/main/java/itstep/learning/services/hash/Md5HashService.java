@@ -10,7 +10,7 @@ public class Md5HashService implements HashService {
 
     @Override
     public String hash(String string) {
-        try {
+        try{
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(string.getBytes());
             byte[] digest = md.digest();

@@ -11,7 +11,8 @@ public class MySqlDbService implements DbService {
 
     @Override
     public Connection getConnection() throws SQLException {
-        if (connection == null) {
+        if (connection == null)
+        {
             // процес підключення: реєструємо драйвер СУБД (MySQL)
             DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
             // формуємо рядок підключення
@@ -20,7 +21,7 @@ public class MySqlDbService implements DbService {
             String username = "user213";
             String password = "pass213";
             // одержуємо підключення
-            connection = DriverManager.getConnection(connectionUrl, username, password);
+            connection = DriverManager.getConnection( connectionUrl, username, password );
         }
         return connection;
     }

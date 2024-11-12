@@ -51,26 +51,27 @@ public class ProductServlet extends RestServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String id = req.getParameter("id");
-        if (id != null) {
-            this.getById(id);
+        if( id != null ) {
+            this.getById( id );
             return;
         }
         String category = req.getParameter("category");
-        if (category != null) {
-            this.getByCategory(category);
+        if( category != null ) {
+            this.getByCategory( category );
             return;
         }
-        super.sendResponse(400, "Missing required field: 'category' or 'id' ");
+        super. sendResponse( 400, "Missing required field: 'category' or 'id' " );
 
     }
 
-    private void getById(String id) throws IOException {
-        super.sendResponse(200, productDao.getByIdOrSlug(id, true));
+    private void getById( String id) throws IOException {
+        super.sendResponse( 200, productDao.getByIdOrSlug( id, true ) );
     }
 
-    private void getByCategory(String category) throws IOException {
-        super.sendResponse(200, productDao.read(category));
+    private void getByCategory( String category) throws IOException {
+        super.sendResponse( 200, productDao.read( category ) );
     }
+
 
 
     @Override // CREATE - створити нову категорію товарів
@@ -91,19 +92,20 @@ public class ProductServlet extends RestServlet {
     }
 
 
+
     private Product parseProduct(HttpServletRequest req) throws Exception {
         FormParseResult formParseResult = formParseService.parse(req);
         String data = formParseResult.getFields().get("product-name");
         Product product = new Product();
         if (data == null || data.isEmpty()) {
-            throw new Exception("Missing required field 'product-name' ");
+            throw new Exception( "Missing required field 'product-name' ");
         }
 
         product.setName(data);
 
         data = formParseResult.getFields().get("product-description");
         if (data == null || data.isEmpty()) {
-            throw new Exception("Missing required field 'product-description' ");
+            throw new Exception( "Missing required field 'product-description' ");
 
         }
 
@@ -111,33 +113,34 @@ public class ProductServlet extends RestServlet {
 
         data = formParseResult.getFields().get("category-id");
         if (data == null || data.isEmpty()) {
-            throw new Exception("Missing required field 'category-id' ");
+            throw new Exception( "Missing required field 'category-id' ");
 
         }
         try {
             product.setCategoryId(UUID.fromString(data));
         } catch (IllegalArgumentException ignored) {
-            throw new Exception("Required 'category-id' has invalid format");
+            throw new Exception( "Required 'category-id' has invalid format" );
         }
 
         data = formParseResult.getFields().get("product-price");
         if (data == null || data.isEmpty()) {
-            throw new Exception("Missing required field 'product-price' ");
+            throw new Exception( "Missing required field 'product-price' ");
 
         }
         try {
             product.setPrice(Double.parseDouble(data));
         } catch (IllegalArgumentException ignored) {
-            throw new Exception("Required 'product-price' has invalid format");
+            throw new Exception( "Required 'product-price' has invalid format" );
         }
 
         data = formParseResult.getFields().get("product-quantity");
         if (data == null || data.isEmpty()) {
             product.setQuantity(1);
-        } else try {
+        }
+        else try {
             product.setQuantity(Integer.parseInt(data));
         } catch (IllegalArgumentException ignored) {
-            throw new Exception("Required 'product-quantity' has invalid format");
+            throw new Exception( "Required 'product-quantity' has invalid format" );
         }
 
 
@@ -145,12 +148,13 @@ public class ProductServlet extends RestServlet {
         // правило Де Моргана
         if (data != null && !data.isEmpty()) {
             if (!productDao.isSlugFree(data)) {
-                throw new Exception("Value of 'product-slug' is not free");
+                throw new Exception( "Value of 'product-slug' is not free");
 
             }
             product.setSlug(data);
 
         }
+
 
 
         try {
@@ -163,6 +167,6 @@ public class ProductServlet extends RestServlet {
         }
         product.setImageUrl(data);
 
-        return product;
+       return product;
     }
 }

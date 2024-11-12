@@ -26,33 +26,35 @@ public class AuthDao {
         this.kdfService = kdfService;
     }
 
-    public User getUserByToken(String token) {
+    public User getUserByToken(String token)
+    {
         UUID tokenId;
-        try {
-            tokenId = UUID.fromString(token);
-        } catch (Exception e) {
-            return null;
-        }
-        String sql = "SELECT * FROM users_access a   " +
+        try {tokenId = UUID.fromString(token);}
+        catch (Exception e) {return null;}
+        String sql= "SELECT * FROM users_access a   " +
                 " JOIN users u ON a.user_id = u.user_id  " +
                 "  JOIN users_roles r ON a.role_id = r.role_id " +
                 "   LEFT JOIN tokens t ON u.user_id = t.user_id AND t.exp > CURRENT_TIMESTAMP" +
                 " WHERE t.token_id = ?";
 
-        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+        try(PreparedStatement prep = dbService.getConnection().prepareStatement(sql))
+        {
             prep.setString(1, tokenId.toString());
             ResultSet rs = prep.executeQuery();
-            if (rs.next()) {
+            if(rs.next())
+            {
                 return new User(rs);
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             logger.warning(e.getMessage() + " -- " + sql);
         }
         return null;
     }
 
     public User signUp(SignupFormModel model) {
-        if (model == null) {
+        if(model == null)
+        {
             return null;
         }
         User user = new User();
@@ -67,15 +69,18 @@ public class AuthDao {
                 "(`user_id` , `user_name`, `email`, `phone` , `avatar_url`, `birthdate`)" +
                 "VALUES (?, ?, ?, ?, ?,?)";
 
-        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
-            prep.setString(1, user.getUserId().toString());
-            prep.setString(2, user.getUserName());
-            prep.setString(3, user.getEmail());
-            prep.setString(4, user.getPhone());
-            prep.setString(5, user.getAvatarUrl());
-            prep.setTimestamp(6, new Timestamp(user.getBirthdate().getTime()));
-            prep.executeUpdate();
-        } catch (SQLException ex) {
+        try(PreparedStatement prep = dbService.getConnection().prepareStatement(sql))
+        {
+            prep.setString( 1, user.getUserId().toString() );
+            prep.setString( 2, user.getUserName() );
+            prep.setString( 3, user.getEmail() );
+            prep.setString( 4, user.getPhone() );
+            prep.setString( 5, user.getAvatarUrl() );
+            prep.setTimestamp( 6, new Timestamp( user.getBirthdate().getTime() ) );
+            prep.executeUpdate ();
+        }
+        catch (SQLException ex)
+        {
             logger.warning(ex.getMessage() + " -- " + sql);
             return null;
         }
@@ -87,13 +92,16 @@ public class AuthDao {
         sql = "INSERT INTO `users_access`(`user_id`,`login`,`salt`,`dk`) " +
                 "VALUES (?, ?, ?, ?) ";
 
-        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
-            prep.setString(1, user.getUserId().toString());
-            prep.setString(2, user.getUserName());
-            prep.setString(3, salt);
-            prep.setString(4, dk);
-            prep.executeUpdate();
-        } catch (SQLException ex) {
+        try(PreparedStatement prep = dbService.getConnection().prepareStatement(sql))
+        {
+            prep.setString( 1, user.getUserId().toString() );
+            prep.setString( 2, user.getUserName() );
+            prep.setString( 3, salt );
+            prep.setString( 4, dk );
+            prep.executeUpdate ();
+        }
+        catch (SQLException ex)
+        {
             logger.warning(ex.getMessage() + " -- " + sql);
             // TODO: Delete user
             return null;
@@ -108,22 +116,28 @@ public class AuthDao {
                 " LEFT JOIN tokens t on a.user_id = t.user_id AND t.exp  > CURRENT_TIMESTAMP" +
                 " WHERE a. login = ?";
 
-        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql))
+        {
             prep.setString(1, login);
             ResultSet rs = prep.executeQuery();
             if (rs.next()) { // є такий login
-                String salt = rs.getString("salt");
-                String dk = rs.getString("dk");
+                String salt = rs.getString( "salt");
+                String dk = rs.getString( "dk");
                 // повторюємо процедуру DK і перевіряємо чи збігаються результати перетворень
-                if (kdfService.dk(password, salt).equals(dk)) {
+                if(kdfService.dk(password, salt).equals(dk))
+                {
                     User user = new User(rs);
                     Token token;
-                    try {
+                    try
+                    {
                         token = new Token(rs);
-                    } catch (SQLException ignored) {
+                    }
+                    catch (SQLException ignored)
+                    {
                         token = null;
                     }
-                    if (token == null) {
+                    if(token == null)
+                    {
                         // створюємо новий токен для користувача
                         token = this.createToken(user);
                     }
@@ -137,7 +151,8 @@ public class AuthDao {
         return null;
     }
 
-    public Token createToken(User user) {
+    public Token createToken(User user)
+    {
         Token token = new Token();
         token.setTokenId(UUID.randomUUID());
         token.setUserId(user.getUserId());
@@ -146,20 +161,23 @@ public class AuthDao {
         String sql = "INSERT INTO tokens (token_id, user_id, iat, exp) " +
                 " VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+        try(PreparedStatement prep = dbService.getConnection().prepareStatement(sql))
+        {
             prep.setString(1, token.getTokenId().toString());
             prep.setString(2, token.getUserId().toString());
             prep.setTimestamp(3, new Timestamp(token.getIat().getTime()));
             prep.setTimestamp(4, new Timestamp(token.getExp().getTime()));
             prep.executeUpdate();
             return token;
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             logger.warning(ex.getMessage() + " -- " + sql);
         }
         return null;
     }
 
-    public boolean install() {
+    public boolean install()
+    {
         String sql = "CREATE TABLE IF NOT EXISTS `users` (" +
                 " `user_id` CHAR(36) PRIMARY KEY DEFAULT ( UUID() )," +
                 " `user_name`   VARCHAR(64)          NOT NULL," +
@@ -170,11 +188,12 @@ public class AuthDao {
                 " `delete_dt`   DATETIME             NULL" +
                 ") ENGINE=InnoDB default CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
-        try (Statement stmt = dbService.getConnection().createStatement()) {
+        try(Statement stmt = dbService.getConnection().createStatement())
+        {
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
-            logger.warning(ex.getMessage() + "--" + sql);
-            return false;
+                logger.warning(ex.getMessage() + "--" + sql);
+                return false;
         }
 
 
@@ -189,7 +208,8 @@ public class AuthDao {
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
 
-        try (Statement stmt = dbService.getConnection().createStatement()) {
+        try(Statement stmt = dbService.getConnection().createStatement())
+        {
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             logger.warning(ex.getMessage() + "--" + sql);
@@ -206,7 +226,8 @@ public class AuthDao {
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
 
-        try (Statement stmt = dbService.getConnection().createStatement()) {
+        try(Statement stmt = dbService.getConnection().createStatement())
+        {
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             logger.warning(ex.getMessage() + "--" + sql);
@@ -221,7 +242,8 @@ public class AuthDao {
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
 
-        try (Statement stmt = dbService.getConnection().createStatement()) {
+        try(Statement stmt = dbService.getConnection().createStatement())
+        {
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             logger.warning(ex.getMessage() + "--" + sql);
@@ -241,7 +263,8 @@ public class AuthDao {
                 "`role_name` = 'Administrator'," +
                 "`can_create` = 1, `can_read` = 1, `can_update` = 1, `can_delete` = 1";
 
-        try (Statement stmt = dbService.getConnection().createStatement()) {
+        try(Statement stmt = dbService.getConnection().createStatement())
+        {
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             logger.warning(ex.getMessage() + "--" + sql);
@@ -254,7 +277,8 @@ public class AuthDao {
                 "`role_name` = 'Guest', " +
                 "`can_create` = 0, `can_read` = 1,`can_update` = 0,`can_delete` = 0";
 
-        try (Statement stmt = dbService.getConnection().createStatement()) {
+        try(Statement stmt = dbService.getConnection().createStatement())
+        {
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             logger.warning(ex.getMessage() + "--" + sql);
@@ -270,7 +294,8 @@ public class AuthDao {
                 "`birthdate` = '1970-01-01'," +
                 "`delete_dt` = NULL";
 
-        try (Statement stmt = dbService.getConnection().createStatement()) {
+        try(Statement stmt = dbService.getConnection().createStatement())
+        {
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             logger.warning(ex.getMessage() + "--" + sql);
@@ -295,7 +320,8 @@ public class AuthDao {
                 "`dk` = ?," +
                 "`is_active` = 1";
 
-        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+        try(PreparedStatement prep = dbService.getConnection().prepareStatement( sql ))
+        {
             prep.setString(1, salt);
             prep.setString(2, dk);
             prep.setString(3, salt);
@@ -306,6 +332,7 @@ public class AuthDao {
             logger.warning(ex.getMessage() + "--" + sql);
             return false;
         }
+
 
 
         return true;

@@ -1,101 +1,97 @@
 ﻿const initialState = {
     authUser: null,
     categories: [],
-    cart: null,
+    cart:null,
     page: 'home',
 };
 
 const AppContext = React.createContext(null);
 
-function reducer(state, action) {
-    switch (action.type) {
+function reducer( state, action ) {
+    switch( action.type ) {
         case 'authenticate' :
             // if( ! window.localStorage.getItem( "auth-user" ) ) {
             window.localStorage.setItem("auth-user", JSON.stringify(action.payload));
             // }
-            return {
-                ...state,
+            return { ...state,
                 authUser: action.payload,
             };
         case 'categories':
-            return {
-                ...state,
+            return { ...state,
                 categories: action.payload,
             };
         case 'cart':
-            return {
-                ...state,
+            return { ...state,
                 cart: action.payload,
             };
         case 'logout' :
-            window.localStorage.removeItem("auth-user");
-            return {
-                ...state,
+            window.localStorage.removeItem( "auth-user" );
+            return { ...state,
                 authUser: null,
                 cart: null,
             };
         case 'navigate':
             window.location.hash = action.payload;
-            return {
-                ...state,
+            return { ...state,
                 page: action.payload,
             };
     }
 }
 
 function App({contextPath, homePath}) {
-    const [state, dispatch] = React.useReducer(reducer, initialState);
-    const loadCategories = React.useCallback(() => {
+    const [state, dispatch] = React.useReducer( reducer, initialState );
+    const loadCategories = React.useCallback( () => {
         fetch(`${contextPath}/shop/category`)
             .then(r => r.json())
             .then(j => dispatch({type: 'categories', payload: j.data}));
     });
-    const checkHash = React.useCallback(() => {
+    const checkHash = React.useCallback( () => {
         let hash = window.location.hash;
-        let path = (hash.length > 1) ? hash.substring(1) : "home";
-        dispatch({type: "navigate", payload: path});
-    });
+        let path = ( hash.length > 1 ) ? hash.substring(1) : "home";
+        dispatch( { type: "navigate", payload: path } );
+    } ) ;
 
-    const refreshCart = React.useCallback(() => {
+    const refreshCart = React.useCallback( () => {
         request('/shop/cart').then(cart => dispatch({type: "cart", payload: cart}))
-        //.catch(console.error);
+            //.catch(console.error);
     });
 
-    const request = React.useCallback((url, params) => new Promise((resolve, reject) => {
-        if (url.startsWith('/')) {
+    const request = React.useCallback( (url, params) => new Promise( (resolve, reject) => {
+        if( url.startsWith('/') ) {
             url = contextPath + url;
         }
-        if (state.authUser && state.authUser.token && state.authUser.token.tokenId) {
-            if (typeof params === "undefined") {
+        if(state.authUser && state.authUser.token && state.authUser.token.tokenId) {
+            if(typeof params === "undefined")
+            {
                 params = {};
             }
-            if (typeof params.headers === "undefined") {
+            if(typeof params.headers === "undefined")
+            {
                 params.headers = {};
             }
-            if (typeof params.headers.Authorization === "undefined") {
+            if(typeof params.headers.Authorization === "undefined")
+            {
                 params.headers.Authorization = "Bearer " + state.authUser.token.tokenId;
             }
         }
-        fetch(url, params)
+        fetch( url, params )
             .then(r => r.json())
             .then(j => {
-                if (j.status.isSuccessful) {
-                    resolve(j.data);
-                } else {
-                    reject(j.data);
-                }
+                if (j.status.isSuccessful) { resolve( j.data ); }
+                else { reject( j.data ); }
             });
-    }));
-    React.useEffect(() => {
-        let authUser = window.localStorage.getItem("auth-user");
-        if (authUser) {
-            authUser = JSON.parse(authUser);
+    } ) );
+    React.useEffect( () => {
+        let authUser = window.localStorage.getItem( "auth-user" );
+        if( authUser ) {
+            authUser = JSON.parse( authUser );
             let token = authUser.token;
-            if (token) {
+            if( token ) {
                 let exp = new Date(token.exp);
-                if (exp < new Date()) {
+                if( exp < new Date() ) {
                     dispatch({type: 'logout'});
-                } else {
+                }
+                else {
                     dispatch({type: 'authenticate', payload: authUser});
                 }
             }
@@ -107,9 +103,9 @@ function App({contextPath, homePath}) {
         return () => {
             window.removeEventListener('hashchange', checkHash);
         };
-    }, []);
+    }, [] );
 
-    React.useEffect(() => {
+    React.useEffect(()=> {
         refreshCart();
 
     }, [state.authUser]);
@@ -135,10 +131,10 @@ function App({contextPath, homePath}) {
                                 <a className="nav-link "
                                    onClick={() => dispatch({type: "navigate", payload: "cart"})}>Кошик
                                     <span className="cart-widget-quantity">{
-                                        state.cart && state.cart.cartItems && state.cart.cartItems.length > 0
-                                            ? state.cart.cartItems.reduce((s, c) => s + c.quantity, 0)
-                                            : 0
-                                    }</span></a>
+                                    state.cart && state.cart.cartItems && state.cart.cartItems.length > 0
+                                        ? state.cart.cartItems.reduce((s,c)=>s + c.quantity, 0)
+                                        : 0
+                                }</span></a>
                             </li>
 
                         </ul>
@@ -161,12 +157,13 @@ function App({contextPath, homePath}) {
                         </div>}
 
                         {state.authUser && <div>
-                            <img src={"storage/" + state.authUser.avatarUrl}
+                            <img src={"storage/" + (state.authUser.avatarUrl || 'no-photo.png')}
                                  alt={state.authUser.userName}
+                                 onClick={()=>dispatch({type: 'navigate', payload: 'profile'})}
                                  className="nav-avatar"/>
 
                             <button type="button" className="btn btn-outline-warning"
-                                    onClick={() => dispatch({type: 'logout'})}>
+                                    onClick={() => dispatch({type: 'logout'}) }>
                                 <i className="bi bi-box-arrow-right"></i>
                             </button>
                             {state.authUser.role.canCreate &&
@@ -182,21 +179,173 @@ function App({contextPath, homePath}) {
             </nav>
         </header>
         <main className="container">
-            {state.page === 'admin' && <Admin/>}
-            {state.page === 'cart' && <Cart/>}
-            {state.page === 'home' && <Home/>}
-            {state.page === 'signup' && <Signup/>}
-            {state.page.startsWith('category/') && <Category id={state.page.substring(9)}/>}
-            {state.page.startsWith('product/') && <Product id={state.page.substring(8)}/>}
+            { state.page === 'admin'   && <Admin/>  }
+            { state.page === 'cart'    && <Cart/>   }
+            { state.page === 'home'    && <Home/>   }
+            {state.page  === 'profile' && <Profile/>}
+            { state.page === 'signup'  && <Signup/> }
+            { state.page.startsWith('category/') && <Category id={state.page.substring(9)}/> }
+            { state.page.startsWith('product/') && <Product id={state.page.substring(8)}/> }
         </main>
         <div className="spacer"></div>
 
-        <AuthModal/>
+        <AuthModal />
 
         <footer className="bg-body-tertiary px-3 py-2">
             &copy; 2024, ITSTEP KN-P-213
         </footer>
     </AppContext.Provider>;
+}
+
+function Profile()
+{
+    const {state, dispatch, request, refreshCart} = React.useContext(AppContext);
+    const [carts, setCarts] = React.useState(null)
+    React.useEffect(()=>{
+        if( !state.authUser ) {
+            dispatch({type: 'navigate', payload: 'home'});
+        }
+    }, [state.authUser]);
+
+    const loadCarts = React.useCallback(() => {
+        request('/shop/profile'). then(cartsArr => {
+            setCarts(cartsArr.sort((a,b) =>
+                {
+                    a = new Date(a. createDt).getTime();
+                    b = new Date(b.createDt).getTime();
+                    return a < b ? -1 : ( a > b ? 1 : 0) ;
+                }
+            ));
+        }).catch(console.error);
+    })
+
+    React.useEffect( () => {
+        loadCarts();
+    }, [] );
+
+    const repeatCart = React.useCallback( (cart) => {
+        let msg;
+        if(state.cart != null && state.cart.cartItems.length > 0)
+        {
+            msg = `Додати до наявного кошику всі позиції цього кошику?`
+        }
+        else
+        {
+            msg = 'Створити замовлення на базі цього кошику';
+        }
+        if(!confirm(msg)) {
+            return;
+        }
+        request ( "/shop/cart", {
+            method: "PATCH",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON. stringify( cart.cartItems)
+        }). then( absents => {
+            refreshCart()
+            loadCarts()
+            if( absents.length > 0)
+            {
+                alert("Не всі товари зх кошику є в наявності, зокрема: " +
+                absents.map(ci => `${ci.name} -- ${ci.quantity} шт`)
+                    .join('\n'));
+            }
+        } ).catch( console.error );
+    })
+
+    return <div>
+        <h1>Кабінет користувача</h1>
+
+        {state.authUser ?
+            <div className="row">
+                <div className="col col-4">
+                    <h2>Персональні дані</h2>
+                    <p> Ім'я: {state.authUser.userName || 'Не зазначене'}  </p>
+                    <p> Телефон: {state.authUser.phone || 'Не зазначене'}  </p>
+                    <p> E-mail: {state.authUser.email || 'Не зазначене'}  </p>
+                    <p> Дата народження: {state.authUser.birthdate || 'Не зазначене'}  </p>
+                    <p>
+
+                        Аватар: {state.authUser.avatarUrl
+                        ? <img src={"storage/" + state.authUser.avatarUrl} alt="Avatar" style={{width: '90%'}}/>
+                        : 'Не зазначен'}
+                    </p>
+
+                </div>
+                <div className="col col-8">
+                    <h2>Історія покупок</h2>
+                    {carts === null && <i>Дані завантажуються ...< /i>}
+                    {carts !== null && carts.length === 0 && <i>Ви ще не здійснювали покупок< /i>}
+                    {carts !== null && carts. length > 0 && <div>
+                        {carts.map(cart => <div className="row" key={cart.id}>
+                            <div className="col">
+                                <a className="btn btn-primary" data-bs-toggle="collapse" href={ "#" + cart.id}
+                                   role="button" aria-expanded="false" aria-controls="collapseExample">
+                                    {new Date(cart.createDt).toDateString()}
+                                </a>
+                            </div>
+                            <div className="col">{
+                                cart.closeDt
+                                    ? new Date(cart.closeDt).toDateString()
+                                    : 'не закритий'
+                            }</div>
+                            <div className="col">{cart.cartItems.reduce((prev, item) => prev + item.quantity, 0)}</div>
+                            <div className="col">
+                                {cart.cartItems.reduce((prev, item) => prev + item.price, 0.0).toFixed()}
+                            </div>
+                            <div className="col">
+                                {cart.closeDt
+                                    ? <button onClick={() => repeatCart(cart)}>Повторити</button>
+                                    : <button  onClick={() => dispatch({
+                                        type: 'navigate',
+                                        payload: 'cart'})}>Закрити</button>
+                                }
+                            </div>
+                            <div className="collapse" id={cart.id}>
+                                <div className="card card-body">
+                                    <div className="row cart-row">
+                                        <div className="col col-2">
+                                            <br/>
+
+                                        </div>
+                                        <div className="col col-4">
+                                            <h5>Назва</h5>
+                                        </div>
+                                        <div className="col col-3">
+                                            <h5>Кількість</h5>
+                                        </div>
+                                        <div className="col col-3">
+                                            <h5>Ціна</h5>
+                                        </div>
+                                    </div>
+                                    {cart.cartItems.map(item => <div className="row cart-row" key={item.productId}>
+                                        <div className="col col-2">
+                                            <picture onClick={() => dispatch({
+                                                type: 'navigate',
+                                                payload: 'product/' + (item.product.slug || item.product.id)})}>
+                                                <img src={"storage/" + item.product.imageUrl} alt="product"/>
+                                            </picture>
+                                        </div>
+                                        <div className="col col-4">
+                                            {item.product.name}
+                                        </div>
+                                        <div className="col col-3">
+                                            {item.quantity}
+                                        </div>
+                                        <div className="col col-3">
+                                            {item.price.toFixed(2)}
+                                        </div>
+                                    </div>)}
+                                </div>
+                            </div>
+                        </div>)}
+                    </div>}
+                </div>
+                <div className="col col-4"></div>
+            </div>
+            : <div> Необхідно автентифікуватись </div>}
+    </div>;
 }
 
 function Admin() {
@@ -437,8 +586,7 @@ function Signup() {
                 </div>
                 <div className="col col-6">
                     <div className="input-group mb-3">
-                        <label className="input-group-text" htmlFor="signup-avatar"><i
-                            className="bi bi-person-circle"></i></label>
+                        <label className="input-group-text" htmlFor="signup-avatar"><i className="bi bi-person-circle"></i></label>
                         <input type="file" className="form-control" name="signup-avatar" id="signup-avatar"/>
                     </div>
                 </div>
@@ -527,12 +675,14 @@ function AuthModal() {
 
 function Cart() {
     const {state, dispatch, request, refreshCart} = React.useContext(AppContext);
-    React.useEffect(() => {
+    React.useEffect(()=>{
     }, [state.authUser])
 
-    const incCartItem = React.useCallback((item, delta) => {
-        if (Number(item.quantity) + Number(delta) === 0) {
-            if (!confirm("Видалити товар з кошику?")) {
+    const incCartItem = React.useCallback ((item, delta) => {
+        if(Number(item.quantity) + Number(delta) === 0)
+        {
+            if(!confirm("Видалити товар з кошику?"))
+            {
                 return;
             }
         }
@@ -544,8 +694,9 @@ function Cart() {
 
     });
 
-    const delCartItem = React.useCallback(item => {
-        if (!confirm("Скасувати весь кошик?")) {
+    const delCartItem = React.useCallback(item =>{
+        if(!confirm("Скасувати весь кошик?"))
+        {
             return;
         }
         request(`/shop/cart?cart-id=${item.cartId}&product-id=${item.productId}`, {
@@ -554,8 +705,9 @@ function Cart() {
         }).then(refreshCart).catch(alert);
     })
 
-    const delCart = React.useCallback(() => {
-        if (!confirm("Скасувати весь кошик?")) {
+    const delCart = React.useCallback(() =>{
+        if(!confirm("Скасувати весь кошик?"))
+        {
             return;
         }
         request(`/shop/cart?cart-id=${state.cart.id}`, {
@@ -564,10 +716,11 @@ function Cart() {
         }).then(refreshCart).catch(alert);
     })
 
-    const buyCart = React.useCallback(() => {
-        if (!confirm(`Підтверджуєте покупку на суму ${
-            state.cart.cartItems.reduce((s, c) => s + c.price, 0.0).toFixed(2)} грн?`)) {
-
+    const buyCart = React.useCallback(() =>{
+        if( ! confirm(`Підтверджуєте покупку на суму ${
+            state.cart.cartItems.reduce((s, c)=>s+c.price,0.0). toFixed( 2)} грн?`) )
+        {
+            return;
         }
         // request(`/shop/cart?cart-id=${item.cartId}&product-id=${item.productId}`, {
         //     method: 'DELETE',
@@ -605,8 +758,7 @@ function Cart() {
                     <div className="col col-2">
                         <picture onClick={() => dispatch({
                             type: 'navigate',
-                            payload: 'product/' + (item.product.slug || item.product.id)
-                        })}>
+                            payload: 'product/' + (item.product.slug || item.product.id)})}>
                             <img src={"storage/" + item.product.imageUrl} alt="product"/>
                         </picture>
                     </div>
@@ -620,15 +772,12 @@ function Cart() {
                         {item.price.toFixed(2)}
                     </div>
                     <div className="col col-2">
-                        <button onClick={() => incCartItem(item, -1)} className="btn btn-outline-warning"><i
-                            className="bi bi-bag-dash"></i></button>
-                        <button onClick={() => incCartItem(item, 1)} className="btn btn-outline-success"><i
-                            className="bi bi-bag-plus"></i></button>
-                        <button onClick={() => delCartItem(item)} className="btn btn-outline-danger"><i
-                            className="bi bi-bag-x"></i></button>
+                        <button onClick={() => incCartItem(item, -1)} className="btn btn-outline-warning"><i className="bi bi-bag-dash"></i></button>
+                        <button onClick={() => incCartItem(item, 1)} className="btn btn-outline-success"><i className="bi bi-bag-plus"></i></button>
+                        <button onClick={() => delCartItem(item)} className="btn btn-outline-danger"><i className="bi bi-bag-x"></i></button>
                     </div>
                 </div>)}
-                {state.cart.cartItems.length >= 0 && <div className="row">
+                {state.cart.cartItems.length > 0 && <div className="row">
                     <div className="col offset-4 col-1">
                         Разом
                     </div>
@@ -639,10 +788,8 @@ function Cart() {
                         {state.cart.cartItems.reduce((s, c) => s + c.price, 0.0).toFixed(2)}
                     </div>
                     <div className="col">
-                        <button onClick={() => buyCart()} className="btn btn-success" title="Придбати"><i
-                            className="bi bi-basket3"></i></button>
-                        <button onClick={() => delCart()} className="btn btn-danger" title="Скасувати"><i
-                            className="bi bi-trash3"></i></button>
+                        <button onClick={() => buyCart()} className="btn btn-success" title="Придбати"><i className="bi bi-basket3"></i></button>
+                        <button onClick={() => delCart()} className="btn btn-danger" title="Скасувати"><i className="bi bi-trash3"></i></button>
 
                     </div>
 
@@ -679,26 +826,27 @@ function Category({id}) {
             .then(j => {
                 if (j.status.isSuccessful) {
                     setProducts(j.data);
-                } else {
+                }
+                else {
                     console.error(j.data);
                 }
             });
     }, [id]);
     return <div>
         <h2>Category page: {id}</h2>
-        {products.map(p => <ProductCard p={p} key={p.id}/>)}
+        {products.map(p => <ProductCard p = {p} key={p.id}/>)}
     </div>;
 }
 
 function Product({id}) {
     const {request, dispatch, refreshCart} = React.useContext(AppContext);
     const [product, setProduct] = React.useState({});
-    React.useEffect(() => {
+    React.useEffect( () => {
         request('/shop/product?id=' + id)
-            .then(setProduct)
-            .catch(console.error);
-    }, [id]);
-    const cartClick = React.useCallback(e => {
+            .then( setProduct )
+            .catch( console.error );
+    }, [id] );
+    const cartClick = React.useCallback( e => {
         request('/shop/cart?product-id=' + product.id, {
             method: 'POST'
         }).then(refreshCart).catch(alert);
@@ -718,16 +866,13 @@ function Product({id}) {
                     <h3>{product.name}</h3>
                     <p>{product.description}</p>
                     <h4>{product.price.toFixed(2)}</h4>
-                    <button onClick={e => {
-                        e.stopPropagation();
-                        cartClick();
-                    }}>
+                    <button onClick={e => {e.stopPropagation();cartClick();}}>
                         До кошику
                     </button>
                     <hr/>
                     <h5>Вас також може зацікавити:</h5>
                     {product.similarProducts && product.similarProducts.map(p =>
-                        <ProductCard p={p} isSmall={true} key={p.id}/>)}
+                        <ProductCard p={p} isSmall={true} key={p.id} /> )}
                 </div>
             </div>
         </div>
@@ -742,19 +887,19 @@ function ProductCard({p, isSmall}) {
     const {state, dispatch, request, refreshCart} = React.useContext(AppContext);
 
 
-    const cartPost = React.useCallback((e, product) => {
+    const cartPost = React.useCallback( (e, product) => {
         e.stopPropagation();
         request('/shop/cart?product-id=' + product.id, {
             method: 'POST'
         }).then(refreshCart).catch(alert);
     });
-    const cartPut = React.useCallback((e, product) => {
+    const cartPut = React.useCallback( (e, product) => {
         e.stopPropagation();
-        request(`/shop/cart?cart-id=${state.cart.id}&product-id=${product.id}&delta=1`, {
+        request( `/shop/cart?cart-id=${state.cart.id}&product-id=${product.id}&delta=1`, {
             method: 'PUT'
         }).then(refreshCart).catch(alert);
     });
-    return <div key={p.id} className={"product-card " + (isSmall ? "scale-75" : "")}
+    return <div key={p.id} className={"product-card " + (isSmall ? "scale-75" : "") }
                 onClick={() => dispatch({type: 'navigate', payload: 'product/' + (p.slug || p.id)})}>
         <picture>
             <img src={"storage/" + p.imageUrl} alt="product"/>

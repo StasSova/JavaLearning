@@ -47,7 +47,8 @@ public class AuthServlet extends RestServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected  void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
         /*
         The 'Basic' HTTP Authentication Scheme
         https://datatracker.ietf.org/doc/html/rfc7617
@@ -59,21 +60,24 @@ public class AuthServlet extends RestServlet {
         // Розділяємо за першим символом ':'
         // запитаємо автентифікацію в DAO
         RestResponse restResponse = new RestResponse();
-        try {
+        try
+        {
             String authHeader = req.getHeader("Authorization");
-            if (authHeader == null) {
+            if (authHeader == null)
+            {
                 throw new ParseException("Authorization header not found", 401);
             }
 
             String authScheme = "Basic ";
-            if (!authHeader.startsWith(authScheme)) {
+            if (! authHeader.startsWith(authScheme)) {
                 throw new ParseException("Invalid Authorization scheme. Required " + authScheme, 400);
             }
 
             String credentials = authHeader.substring(authScheme.length());
 
             String decodedCredentials;
-            try {
+            try
+            {
                 decodedCredentials = new String(Base64.getDecoder().decode(credentials.getBytes(StandardCharsets.UTF_8)),
                         StandardCharsets.UTF_8
                 );
@@ -82,20 +86,23 @@ public class AuthServlet extends RestServlet {
             }
 
             String[] parts = decodedCredentials.split(":", 2);
-            if (parts.length != 2) {
+            if (parts.length != 2)
+            {
                 throw new ParseException("Invalid credentials composition", 400);
             }
 
             User user = authDao.authenticate(parts[0], parts[1]);
-            if (user == null) {
+            if (user == null)
+            {
                 throw new ParseException("Credentials rejected", 401);
             }
 
-            super.sendResponse(user);
+            super.sendResponse( user );
 
 
-        } catch (ParseException ex) {
-            super.sendResponse(ex.getErrorOffset(), ex.getMessage());
+        }
+        catch (ParseException ex){
+            super.sendResponse( ex.getErrorOffset(), ex. getMessage() );
         }
 
     }
@@ -106,8 +113,8 @@ public class AuthServlet extends RestServlet {
                 new RestMetaData()
                         .setUrl("/auth")
                         .setMethod((req.getMethod()))
-                        .setName("KN-P-213 Authentication API")
-                        .setServerTime(new Date())
+                        . setName ( "KN-P-213 Authentication API" )
+                        . setServerTime( new Date() )
                         .setAllowedMethods(new String[]{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
         );
 
@@ -121,81 +128,93 @@ public class AuthServlet extends RestServlet {
         SignupFormModel model;
         try {
             model = getSignupFormModel(req);
-        } catch (Exception ex) {
+        }
+        catch( Exception ex ) {
             super.sendResponse(400, ex.getMessage());
             return;
         }
-        User user = authDao.signUp(model);
-        if (user == null) {
-            super.sendResponse(400, "Signup error");
-        } else {
-            super.sendResponse(201, user);
+        User user = authDao.signUp( model );if( user == null ) {
+            super.sendResponse( 400, "Signup error" );
         }
+        else {
+            super.sendResponse( 201, user );
+        }
+
 
 
     }
 
 
+
     private SignupFormModel getSignupFormModel(HttpServletRequest req) throws Exception {
         // АЛЕ! за умови, що форма передається як х-www-form-urlencoded
         // і не працює для multipart/form-data
-        FormParseResult formParseResult = formParseService.parse(req);
+        FormParseResult formParseResult = formParseService.parse( req );
         SignupFormModel model = new SignupFormModel();
         String data = formParseResult.getFields().get("signup-name");
-        if (data == null || data.isEmpty()) {
+        if (data == null || data.isEmpty())
+        {
             throw new Exception("Missing or empty required field 'signup-name'");
         }
         model.setName(data);
 
         data = formParseResult.getFields().get("signup-email");
-        if (data == null || data.isEmpty()) {
+        if (data == null || data.isEmpty())
+        {
             throw new Exception("Missing or empty required field 'signup-email'");
         }
         model.setEmail(data);
 
         data = formParseResult.getFields().get("signup-phone");
-        if (data == null || data.isEmpty()) {
+        if (data == null || data.isEmpty())
+        {
             throw new Exception("Missing or empty required field 'signup-phone'");
         }
         model.setPhone(data);
 
         data = formParseResult.getFields().get("signup-login");
-        if (data == null || data.isEmpty()) {
+        if (data == null || data.isEmpty())
+        {
             throw new Exception("Missing or empty required field 'signup-login'");
         }
         model.setLogin(data);
 
         data = formParseResult.getFields().get("signup-password");
-        if (data == null || data.isEmpty()) {
+        if (data == null || data.isEmpty())
+        {
             throw new Exception("Missing or empty required field 'signup-password'");
         }
         model.setPassword(data);
 
         data = formParseResult.getFields().get("signup-repeat");
-        if (data == null || data.isEmpty()) {
+        if( data == null || data. isEmpty() ){
             throw new Exception("Missing or empty required field 'signup-repeat'");
         }
-        if (!model.getPassword().equals(data)) {
-            throw new Exception("Password and repeat do not match");
+        if( ! model. getPassword ().equals( data ) ) {
+            throw new Exception( "Password and repeat do not match" );
         }
-        model.setRepeat(data);
+        model.setRepeat( data );
 
         data = formParseResult.getFields().get("signup-birthdate");
-        if (data == null || data.isEmpty()) {
+        if (data == null || data.isEmpty())
+        {
             throw new Exception("Missing or empty required field 'signup-birthdate'");
         }
-        try {
-            model.setBirthdate(sqlDateFormat.parse(data));
-        } catch (ParseException ex) {
+        try
+        {
+            model.setBirthdate( sqlDateFormat.parse(data) );
+        }
+        catch( ParseException ex) {
             throw new Exception("Invalid birthdate", ex);
         }
 
         try {
             data = storageService.saveFile(
-                    formParseResult.getFiles().get("signup-avatar"));
-        } catch (IOException ex) {
+                    formParseResult.getFiles().get("signup-avatar") );
+        }
+        catch( IOException ex ) {
             logger.warning(ex.getMessage());
-            throw new Exception("Error processing 'signup-avatar'");
+            throw new Exception( "Error processing 'signup-avatar'");
         }
         model.setAvatar(data);
 

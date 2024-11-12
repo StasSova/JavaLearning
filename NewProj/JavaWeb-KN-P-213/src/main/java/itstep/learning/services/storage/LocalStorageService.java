@@ -24,14 +24,14 @@ public class LocalStorageService implements StorageService {
 
     @Override
     public File getFile(String fileName) {
-        if (fileName == null) {
+        if( fileName == null ) {
             return null;
         }
-        File file = new File(storagePath, fileName);
-        if (!file.exists()) {
-            return null;
-        }
-        return file;
+            File file = new File( storagePath, fileName );
+            if( ! file.exists() ) {
+                return null;
+            }
+                return file;
     }
 
     @Override
@@ -47,16 +47,16 @@ public class LocalStorageService implements StorageService {
 
         String fileName = fileItem.getName();
         if (fileName == null) {
-            throw new IOException("FileItem has no name");
+            throw new IOException( "FileItem has no name" );
 
         }
         // виділяємо розширення з початкового імені файлу
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex == -1) {
+        int dotIndex = fileName.lastIndexOf( '.' );
+        if( dotIndex == -1 ) {
             throw new IOException("FileItem has no extension");
         }
-        String extension = fileName.substring(dotIndex);
-        if (".".equals(extension)) {
+            String extension = fileName. substring( dotIndex );
+        if(".".equals(extension)) {
             throw new IOException("FileItem has empty extension");
         }
         // генеруємо нове ім'я файлу, перевіряємо що такого немає у сховищі
@@ -64,20 +64,20 @@ public class LocalStorageService implements StorageService {
         File file;
         do {
             savedName = fileNameService.generateRandomFileName() + extension;
-            file = new File(storagePath, savedName);
-        } while (file.exists());
+            file = new File( storagePath, savedName );
+        } while( file.exists() );
 
         long size = fileItem.getSize();
-        if (size > bufferSize) {
+        if( size > bufferSize ) {
             size = bufferSize;
         }
-        byte[] buffer = new byte[(int) size];
+        byte[] buffer = new byte[(int)size];
         int len;
-        try (FileOutputStream fos = new FileOutputStream(file);
-             InputStream in = fileItem.getInputStream()
+        try(FileOutputStream fos = new FileOutputStream( file );
+            InputStream in = fileItem.getInputStream()
         ) {
-            while ((len = in.read(buffer)) > 0) {
-                fos.write(buffer, 0, len);
+            while( ( len = in.read( buffer ) ) > 0 ) {
+                fos.write( buffer, 0, len );
             }
         }
         return savedName;

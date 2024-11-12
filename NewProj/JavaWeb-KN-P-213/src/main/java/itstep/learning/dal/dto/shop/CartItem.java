@@ -13,24 +13,20 @@ public class CartItem {
     private Cart cart;
     private Product product;
 
-    public CartItem() {
+    public CartItem()
+    {
 
     }
 
-    public CartItem(ResultSet rs) throws SQLException {
+    public CartItem(ResultSet rs) throws SQLException
+    {
         this.setCartId(UUID.fromString(rs.getString("cart_id")));
         this.setProductId(UUID.fromString(rs.getString("product_id")));
         this.setQuantity(rs.getInt("cart_item_quantity"));
         this.setPrice(rs.getDouble("cart_item_price"));
 
-        try {
-            this.setCart(new Cart(rs));
-        } catch (Exception ignored) {
-        }
-        try {
-            this.setProduct(new Product(rs));
-        } catch (Exception ignored) {
-        }
+        try { this. setCart( new Cart( rs ) ); } catch( Exception ignored ) {}
+        try { this. setProduct( new Product( rs ) ); } catch( Exception ignored ) {}
     }
 
     public UUID getCartId() {

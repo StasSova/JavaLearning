@@ -1,6 +1,5 @@
 package itstep.learning.ioc;
 
-import itstep.learning.services.filename.FileNameService;
 import itstep.learning.servlets.*;
 
 import com.google.inject.servlet.ServletModule;
@@ -18,16 +17,17 @@ public class WebModule extends ServletModule {
 
 
         // те ж саме з сервлетами
-        serve("/").with(HomeServlet.class);
-        serve("/auth").with(AuthServlet.class);
-        serve("/storage/*").with(StorageServlet.class);
-        serve("/web-xml").with(WebXmlServlet.class);
+        serve( "/"        ).with( HomeServlet.class);
+        serve( "/auth"    ).with( AuthServlet.class);
+        serve( "/storage/*" ).with( StorageServlet.class );
+        serve( "/web-xml" ).with( WebXmlServlet.class );
 
         filter("/shop/*").through(TokenAuthFilter.class);
 
-        serve("/shop/cart").with(CartServlet.class);
-        serve("/shop/category").with(CategoryServlet.class);
-        serve("/shop/product").with(ProductServlet.class);
+        serve("/shop/cart").with( CartServlet.class);
+        serve( "/shop/category" ).with( CategoryServlet.class );
+        serve( "/shop/product" ).with( ProductServlet.class );
+        serve( "/shop/profile" ).with( ProfileServlet.class);
 
 
     }

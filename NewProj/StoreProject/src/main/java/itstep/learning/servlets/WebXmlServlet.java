@@ -20,7 +20,8 @@ public class WebXmlServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected  void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
         req.setAttribute("hash", kdfService.hashCode());
 
         req.setAttribute("body", "web_xml.jsp"); // ViewData["body"] = "home.jsp   "

@@ -57,13 +57,12 @@ public class StorageServlet extends HttpServlet {
         int dotIndex = filename.lastIndexOf('.');
         String extension = dotIndex == -1 ? "" : filename.substring(dotIndex + 1);
         switch (extension) {
-            case "jpg":
-                extension = "jpeg";
+            case "jpg": extension = "jpeg";
             case "jpeg":
-            case "png":
+                case "png":
             case "bmp":
-            case "gif":
-                return "image/" + extension;
+                case "gif":
+                    return "image/" + extension;
         }
         return "application/octet-stream";
     }

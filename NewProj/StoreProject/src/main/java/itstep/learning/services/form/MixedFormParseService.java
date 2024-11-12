@@ -19,9 +19,9 @@ import java.util.logging.Logger;
  */
 @Singleton
 public class MixedFormParseService implements FormParseService {
-    private final static int memoryLimit = 3 * 1024 * 1024;  // 3MB file in memory
+    private final static int memoryLimit   = 3 * 1024 * 1024;  // 3MB file in memory
     private final static int maxSingleFile = 2 * 1024 * 1024;  // 2MB max limit for single file
-    private final static int maxFormSize = 5 * 1024 * 1024;  // 5MB max limit for form
+    private final static int maxFormSize   = 5 * 1024 * 1024;  // 5MB max limit for form
 
     private final ServletFileUpload servletFileUpload;
     private final Logger logger;
@@ -32,9 +32,9 @@ public class MixedFormParseService implements FormParseService {
         DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setSizeThreshold(memoryLimit);
         factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
-        servletFileUpload = new ServletFileUpload(factory);
-        servletFileUpload.setFileSizeMax(maxSingleFile);
-        servletFileUpload.setSizeMax(maxFormSize);
+        servletFileUpload = new ServletFileUpload( factory );
+        servletFileUpload.setFileSizeMax( maxSingleFile );
+        servletFileUpload.setSizeMax( maxFormSize );
     }
 
     @Override
@@ -47,23 +47,28 @@ public class MixedFormParseService implements FormParseService {
 
         String contentType = req.getHeader("Content-Type");
         boolean isMultipart = contentType != null && contentType.contains("multipart/form-data");
-        if (isMultipart) { // Apache
+        if( isMultipart ) { // Apache
             String charset = req.getCharacterEncoding(); // встановлюється у CharsetFilter
-            if (charset != null) {
+            if( charset != null ) {
                 charset = "UTF-8";
             }
-            try {
+            try{
                 for (FileItem fileItem : servletFileUpload.parseRequest(req)) {
                     if (fileItem.isFormField()) {
                         formFields.put(fileItem.getFieldName(), fileItem.getString(charset));
-                    } else {
+                    }
+                    else{
                         formFiles.put(fileItem.getFieldName(), fileItem);
                     }
                 }
-            } catch (FileUploadException | UnsupportedEncodingException ex) {
+            }
+            catch (FileUploadException | UnsupportedEncodingException ex)
+            {
                 logger.warning(ex.getMessage());
             }
-        } else { // Servlet API
+        }
+        else
+        { // Servlet API
             for (Map.Entry<String, String[]> entry : req.getParameterMap().entrySet()) {
                 formFields.put(entry.getKey(), entry.getValue()[0]);
             }

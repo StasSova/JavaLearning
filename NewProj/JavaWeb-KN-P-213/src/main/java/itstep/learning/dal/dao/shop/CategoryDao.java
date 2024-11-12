@@ -32,14 +32,16 @@ public class CategoryDao {
                 "(`category_id`, `category_name`, `category_description`, `category_img_url`, `category_delete_dt` )" +
                 "VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+        try(PreparedStatement prep = dbService.getConnection().prepareStatement(sql))
+        {
             prep.setString(1, category.getId().toString());
             prep.setString(2, category.getName());
             prep.setString(3, category.getDescription());
             prep.setString(4, category.getImageUrl());
-            if (category.getDeleteDt() != null) {
-                prep.setTimestamp(5, new Timestamp(category.getDeleteDt().getTime()));
-            } else {
+            if( category. getDeleteDt() != null ) {
+                prep.setTimestamp( 5, new Timestamp( category. getDeleteDt().getTime() ) );
+            }
+            else {
                 prep.setTimestamp(5, null);
             }
             prep.executeUpdate();
@@ -54,14 +56,15 @@ public class CategoryDao {
         List<Category> categories = new ArrayList<>();
 
         String sql = "SELECT * FROM categories";
-        try (Statement stmt = dbService.getConnection().createStatement()) {
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                categories.add(new Category(rs));
+        try(Statement stmt = dbService.getConnection().createStatement() ) {
+            ResultSet rs = stmt.executeQuery( sql );
+            while ( rs.next() ) {
+                categories.add( new Category( rs ) ) ;
             }
             rs.close();
-        } catch (SQLException ex) {
-            logger.warning(ex.getMessage() + " -- " + sql);
+        }
+        catch( SQLException ex ) {
+            logger.warning( ex.getMessage() + " -- " + sql );
         }
 
         return categories;

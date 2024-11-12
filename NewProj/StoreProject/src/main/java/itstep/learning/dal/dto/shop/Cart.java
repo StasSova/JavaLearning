@@ -20,7 +20,8 @@ public class Cart {
 
     private CartItem[] cartItems;
 
-    public Cart() {
+    public Cart()
+    {
 
     }
 
@@ -29,16 +30,14 @@ public class Cart {
         this.setUserId(UUID.fromString(rs.getString("user_id")));
         Timestamp timestamp;
         timestamp = rs.getTimestamp("cart_create_dt");
-        this.setCreateDt(new Date(timestamp.getTime()));
-        timestamp = rs.getTimestamp("cart_close_dt");
-        if (timestamp != null) {
+        this.setCreateDt( new Date( timestamp.getTime() ) );
+        timestamp = rs.getTimestamp( "cart_close_dt" );
+        if ( timestamp != null ) {
             this.setCloseDt(new Date(timestamp.getTime()));
         }
         this.setStatus(rs.getInt("cart_status"));
-        try {
-            this.setUser(new User(rs));
-        } catch (Exception ignored) {
-        }
+        try { this.setUser( new User( rs ) ); }
+        catch( Exception ignored ) {}
     }
 
     public CartItem[] getCartItems() {
@@ -96,6 +95,7 @@ public class Cart {
     public void setUser(User user) {
         this.user = user;
     }
+
 
 
 }

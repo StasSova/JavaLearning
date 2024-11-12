@@ -30,7 +30,8 @@ public class TokenAuthFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         String authHeader = req.getHeader("Authorization");
-        if (authHeader != null) {
+        if (authHeader != null)
+        {
             String authScheme = "Bearer ";
             if (authHeader.startsWith(authScheme)) {
                 String token = authHeader.substring(authScheme.length());
@@ -42,7 +43,7 @@ public class TokenAuthFilter implements Filter {
         }
 
 
-        filterChain.doFilter(servletRequest, servletResponse);
+    filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override
